@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<style>
+.filterDiv {
+  display:none;
+}
+.show1 {
+  display: inline-block;
+}
+.btn:hover {
+  background-color: #ddd;
+}
+
+.btn.active {
+  background-color: #666;
+  color: white;
+}
+.container {
+	width: 750px;
+	display: inline-block;
+	margin-top: 58px;
+	white-space: nowrap;
+}
+img{
+	padding: 50px;
+	height: 350px;
+	width: 350px;
+	transition: transform .2s;
+}
+img:hover{
+	 transform: scale(1.5);
+}
+.dropdown{
+	float:right;
+	margin-right: 20px;
+	margin-top:-28px;
+}
+#myInput{
+	margin-top:40px;
+	margin-left:20px;
+}
+.dropdown-menu{
+	margin-right: 50px;
+
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+</style>
+<body>
+<div>
+<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names.." title="Type in a name">
+</div>
+<div id="myBtnContainer" class="dropdown">
+  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">filter</button>
+  <ul class="dropdown-menu">
+  <li class="btn1 active" onclick="filterSelection('all')"> Show all</li>
+  <li class="btn1" onclick="filterSelection('Main course')"> Main course</li>
+
+  <li class="btn1" onclick="filterSelection('Drinks')"> Drinks</li>
+  <li class="btn1" onclick="filterSelection('Ice creams')"> Ice creams</li>
+  <li class="btn1" onclick="filterSelection('Starters')"> Starters</li>
+</ul>
+</div>
+
+<ul class="container" id="myUL">
+</ul>
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p id="para"></p>
+  </div>
+
+</div>
+
+<script>
+
+filterSelection("all");
+var xhttp=new XMLHttpRequest();
+	xhttp.onreadystatechange=function(){
+	if(this.readyState==4 && this.status==200){
+		let o=JSON.parse(xhttp.responseText)
+		console.log(o.recipes,o.recipes.length,o.recipes[0].image);
+		for(var i=0;i<o.recipes.length;i++)
+		{
+			document.getElementById('myUL').innerHTML+="<li class='filterDiv "+o.recipes[i].category+"' id='lip'><center><img src='"+o.recipes[i].image+"'><div class='text-block'>"+o.recipes[i].name+"</div></center></li>";
+		}
+		
+}
+};
+
+	xhttp.open(
+		"GET",
+		"http://temp.dash.zeta.in/food.php",
+		true
+	);
+	xhttp.send();
+
+
+function filterSelection(c) {
+  var x, i;
+  x = document.getElementsByClassName("filterDiv");
+  if (c == "all") c = "";
+  for (i = 0; i < x.length; i++) {
+    w3RemoveClass(x[i], "show1");
+    if (x[i].className.indexOf(c) > -1) w3AddClass(x[i], "show1");
+  }
+}
+
+function w3AddClass(element, name) {
+  var i, arr1, arr2;
+  arr1 = element.className.split(" ");
+  arr2 = name.split(" ");
+  for (i = 0; i < arr2.length; i++) {
+    if (arr1.indexOf(arr2[i]) == -1) {element.className += " " + arr2[i];}
+  }
+}
+
+function w3RemoveClass(element, name) {
+  var i, arr1, arr2;
+  arr1 = element.className.split(" ");
+  arr2 = name.split(" ");
+  for (i = 0; i < arr2.length; i++) {
+    while (arr1.indexOf(arr2[i]) > -1) {
+      arr1.splice(arr1.indexOf(arr2[i]), 1);     
+    }
+  }
+  element.className = arr1.join(" ");
+}
+
+// Add active class to the current button (highlight it)
+var btnContainer = document.getElementById("myBtnContainer");
+var btns = btnContainer.getElementsByClassName("btn1");
+for (var i = 0; i < btns.length; i++) {
+  btns[i].addEventListener("click", function(){
+    var current = document.getElementsByClassName("active");
+    current[0].className = current[0].className.replace(" active", "");
+    this.className += " active";
+  });
+}
+function myFunction() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("myUL");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
+    }
+}
+
+var modal = document.getElementById('myModal');
+document.getElementById("para").innerHTML+="hi";
+// Get the button that opens the modal
+var btn = document.getElementById("lip");
+console.log(btn);
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal 
+btn.onclick = function() {
+  
+  modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
+
+</body>
+</html>
+
